@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DHCPd-Guard | Network Monitoring & Security Dashboard</title>
+  <meta name="description" content="Secure, Manage, Connect - Real-time Network Monitoring and DHCP Security Dashboard">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Chart.js for smooth and exact area/donut charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Main Container -->
+  <div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h2 class="brand-name">DHCPd-Guard</h2>
+            <span class="brand-tagline">Secure • Manage • Connect</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" id="nav-dashboard">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-label">Dashboard</span>
+        </a>
+
+        <a href="#ip-pool" class="nav-item" id="nav-ip-pool" onclick="openModal('addRangeModal')">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+          </span>
+          <span class="nav-label">IP Pool Management</span>
+        </a>
+
+        <a href="#active-leases" class="nav-item" id="nav-active-leases" onclick="openModal('allLeasesModal')">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="12" x="3" y="4" rx="2"/>
+              <line x1="2" x2="22" y1="20" y2="20"/>
+            </svg>
+          </span>
+          <span class="nav-label">Active Leases</span>
+        </a>
+
+        <a href="#attack-monitoring" class="nav-item" id="nav-attack-monitoring" onclick="openModal('securityModal')">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v4"/>
+              <path d="M12 16h.01"/>
+            </svg>
+          </span>
+          <span class="nav-label">Attack Monitoring</span>
+        </a>
+
+        <a href="#logs" class="nav-item" id="nav-logs" onclick="openModal('logsModal')">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" x2="8" y1="13" y2="13"/>
+              <line x1="16" x2="8" y1="17" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </span>
+          <span class="nav-label">Logs</span>
+        </a>
+
+        <a href="#settings" class="nav-item" id="nav-settings" onclick="openModal('rulesModal')">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </span>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer Status -->
+      <div class="sidebar-footer">
+        <div class="server-status-card">
+          <div class="server-status-badge">
+            <span class="status-indicator-dot online"></span>
+            <span class="status-text">Server Online</span>
+          </div>
+          <p class="server-address" id="server-ip-info">DHCP engine: UDP 6767</p>
+          <span class="server-version">v1.0.0</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-titles">
+          <h1 class="page-title">DHCPd-Guard</h1>
+          <p class="page-subtitle">Network Monitoring & Security Dashboard</p>
+        </div>
+
+        <div class="header-actions">
+          <!-- Notification Bell -->
+          <div class="notification-wrapper" id="notif-wrapper">
+            <button class="icon-btn" id="notif-btn" title="Notifications" onclick="toggleNotifications()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+              </svg>
+              <span class="notification-badge" id="notif-badge"></span>
+            </button>
+            <div class="notification-dropdown" id="notif-dropdown">
+              <div class="notif-header">
+                <h3>Security Alerts</h3>
+                <span class="notif-count">0 new</span>
+              </div>
+              <div class="notif-list">
+                <div style="padding:20px;text-align:center;color:#64748b;">No new security alerts.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Profile & Clock -->
+          <div class="user-profile">
+            <div class="user-avatar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/>
+              </svg>
+            </div>
+            <div class="user-details">
+              <span class="user-name">admin</span>
+              <div class="user-time" id="clock-display">
+                <span class="time-part">12:45 PM</span>
+                <span class="date-part">Sep 12, 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard Body -->
+      <div class="dashboard-body">
+
+        <!-- Row 1: Stat Cards (4 Cards) -->
+        <section class="stat-cards-grid">
+          <!-- Card 1: Total IP Pool -->
+          <div class="stat-card blue-theme">
+            <div class="stat-icon-wrapper blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"/>
+                <circle cx="6" cy="12" r="3"/>
+                <circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Total IP Pool</span>
+              <div class="stat-value-group">
+                <span class="stat-value" id="stat-total-ip">50</span>
+                <span class="stat-subtext" id="stat-pool-range">(101 - 150)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Active Leases -->
+          <div class="stat-card green-theme">
+            <div class="stat-icon-wrapper green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Active Leases</span>
+              <div class="stat-value-group">
+                <span class="stat-value" id="stat-active-leases">28</span>
+                <span class="stat-subtext green" id="stat-active-percent">(56% used)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Available IPs -->
+          <div class="stat-card purple-theme">
+            <div class="stat-icon-wrapper purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Available IPs</span>
+              <div class="stat-value-group">
+                <span class="stat-value" id="stat-available-ips">22</span>
+                <span class="stat-subtext purple" id="stat-available-percent">(44% free)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Blocked Attacks -->
+          <div class="stat-card red-theme">
+            <div class="stat-icon-wrapper red">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="stat-content">
+              <span class="stat-label">Blocked Attacks</span>
+              <div class="stat-value-group">
+                <span class="stat-value" id="stat-blocked-attacks">3</span>
+                <span class="stat-subtext" id="stat-blocked-time">(Last 24 hours)</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Row 2: Charts (3 Columns) -->
+        <section class="charts-grid">
+
+          <!-- Chart 1: IP Pool Usage -->
+          <div class="card chart-card" id="card-ip-usage">
+            <div class="card-header">
+              <div class="card-title-group">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" x2="8" y1="13" y2="13"/>
+                  <line x1="16" x2="8" y1="17" y2="17"/>
+                </svg>
+                <h3>IP Pool Usage</h3>
+              </div>
+            </div>
+
+            <div class="donut-chart-wrapper">
+              <div class="canvas-donut-box">
+                <canvas id="ipPoolDonutChart"></canvas>
+                <div class="donut-center-text">
+                  <span class="donut-percent" id="donut-usage-percent">56%</span>
+                  <span class="donut-sublabel">In Use</span>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-row">
+                  <span class="legend-dot green"></span>
+                  <span class="legend-label">Active Leases</span>
+                  <span class="legend-val" id="legend-active-leases">28</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot slate"></span>
+                  <span class="legend-label">Available</span>
+                  <span class="legend-val" id="legend-available-leases">22</span>
+                </div>
+                <div class="legend-row total-row">
+                  <span class="legend-dot transparent"></span>
+                  <span class="legend-label">Total</span>
+                  <span class="legend-val" id="legend-total-ips">50</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart 2: Network Activity (DHCP Requests) -->
+          <div class="card chart-card large-chart" id="card-network-activity">
+            <div class="card-header">
+              <div class="card-title-group">
+                <h3>Network Activity <span class="chart-subtitle">(DHCP Requests)</span></h3>
+              </div>
+              <div class="card-control">
+                <select id="activity-time-filter" class="custom-select" onchange="changeTimeFilter(this.value)">
+                  <option value="24h" selected>Last 24 Hours</option>
+                  <option value="12h">Last 12 Hours</option>
+                  <option value="7d">Last 7 Days</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="line-chart-container">
+              <canvas id="networkActivityChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 3: Attack Detection -->
+          <div class="card chart-card" id="card-attack-detection">
+            <div class="card-header">
+              <div class="card-title-group">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9 12 12 15 15 9"/>
+                </svg>
+                <h3>Attack Detection</h3>
+              </div>
+            </div>
+
+            <div class="donut-chart-wrapper">
+              <div class="canvas-donut-box">
+                <canvas id="attackDonutChart"></canvas>
+                <div class="donut-center-text">
+                  <span class="donut-percent" id="donut-attack-total">3</span>
+                  <span class="donut-sublabel">Blocked</span>
+                </div>
+              </div>
+              <div class="donut-legend attack-legend">
+                <div class="legend-row">
+                  <span class="legend-dot red"></span>
+                  <span class="legend-label">Starvation Attack</span>
+                  <span class="legend-val" id="legend-starvation-attacks">2</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot orange"></span>
+                  <span class="legend-label">Rogue DHCP Server</span>
+                  <span class="legend-val" id="legend-rogue-attacks">1</span>
+                </div>
+                <div class="legend-row">
+                  <span class="legend-dot slate"></span>
+                  <span class="legend-label">Other</span>
+                  <span class="legend-val" id="legend-other-attacks">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Row 3: Active Leases & Recent Events (2 Columns) -->
+        <section class="tables-grid">
+
+          <!-- Active Leases Table -->
+          <div class="card table-card" id="card-active-leases">
+            <div class="card-header">
+              <div class="card-title-group">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="12" x="3" y="4" rx="2"/>
+                  <line x1="2" x2="22" y1="20" y2="20"/>
+                </svg>
+                <h3>Active Leases</h3>
+              </div>
+              <a href="javascript:void(0)" class="view-all-link" onclick="openModal('allLeasesModal')">View All &rarr;</a>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table" id="leases-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>IP Address</th>
+                    <th>MAC Address</th>
+                    <th>Device Type</th>
+                    <th>Lease Time Left</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="leases-tbody">
+                  <!-- Rendered dynamically by app.js matching the 5 rows in screenshot -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Recent Events Timeline -->
+          <div class="card events-card" id="card-recent-events">
+            <div class="card-header">
+              <div class="card-title-group">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <h3>Recent Events</h3>
+              </div>
+              <a href="javascript:void(0)" class="view-all-link" onclick="openModal('logsModal')">View All &rarr;</a>
+            </div>
+
+            <div class="events-timeline" id="events-timeline-list">
+              <!-- Rendered dynamically by app.js matching the 5 events in screenshot -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Row 4: Bottom Widgets (3 Columns) -->
+        <section class="bottom-grid">
+
+          <!-- Widget 1: IP Pool Range Progress -->
+          <div class="card bottom-card" id="card-pool-range">
+            <div class="pool-range-header">
+              <div class="widget-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect width="18" height="12" x="3" y="4" rx="2"/>
+                  <line x1="2" x2="22" y1="20" y2="20"/>
+                </svg>
+                <h4>IP Pool Range</h4>
+              </div>
+              <span class="range-numbers" id="bottom-pool-range-num">101 - 150</span>
+            </div>
+
+            <div class="range-progress-bar">
+              <div class="progress-segment used" id="progress-bar-used" style="width: 56%;"></div>
+              <div class="progress-segment free" id="progress-bar-free" style="width: 44%;"></div>
+            </div>
+
+            <div class="range-legend">
+              <div class="legend-item">
+                <span class="legend-dot green"></span>
+                <span>Used (<span id="bottom-used-count">28</span>)</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot slate"></span>
+                <span>Free (<span id="bottom-free-count">22</span>)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Widget 2: Quick Actions -->
+          <div class="card bottom-card" id="card-quick-actions">
+            <div class="widget-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <h4>Quick Actions</h4>
+            </div>
+
+            <div class="quick-actions-row">
+              <button class="action-btn" onclick="openModal('addRangeModal')" title="Add or edit IP range">
+                <div class="action-icon-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                </div>
+                <span>Add IP Range</span>
+              </button>
+
+              <button class="action-btn" onclick="openModal('logsModal')" title="View detailed network logs">
+                <div class="action-icon-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" x2="8" y1="13" y2="13"/>
+                    <line x1="16" x2="8" y1="17" y2="17"/>
+                  </svg>
+                </div>
+                <span>View Logs</span>
+              </button>
+
+              <button class="action-btn" onclick="openModal('rulesModal')" title="Configure protection rules">
+                <div class="action-icon-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 12 15 15 9"/>
+                  </svg>
+                </div>
+                <span>Manage Rules</span>
+              </button>
+
+              <button class="action-btn" id="btn-restart-server" onclick="restartServer()" title="Restart DHCP Daemon">
+                <div class="action-icon-circle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                  </svg>
+                </div>
+                <span>Restart Server</span>
+              </button>
+
+              <!-- Extra Interactive Demo: Simulate Attack -->
+              <button class="action-btn simulate-btn" onclick="simulateAttackPrompt()" title="Simulate Attack (Security Demo)">
+                <div class="action-icon-circle red-pulse">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </div>
+                <span>Simulate Attack</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Widget 3: Security & Protection -->
+          <div class="card bottom-card security-card" id="card-security-protection">
+            <div class="security-card-content">
+              <div class="security-title-row">
+                <div class="security-shield-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 12 15 15 9"/>
+                  </svg>
+                </div>
+                <h4>Security & Protection</h4>
+              </div>
+              <p class="security-desc">
+                Rate limiting, MAC tracking and starvation attack detection are active.
+              </p>
+              <a href="javascript:void(0)" class="security-link" onclick="openModal('securityModal')">View Security Details &rarr;</a>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Modal: Add IP Range -->
+  <div class="modal-backdrop" id="addRangeModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Configure IP Pool Range</h3>
+        <button class="close-btn" onclick="closeModal('addRangeModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-intro">Update the active DHCP allocation pool range. Leases outside the new range will gracefully expire.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Subnet Base</label>
+            <input type="text" class="form-input" id="input-subnet" value="192.168.1" readonly>
+          </div>
+          <div class="form-group">
+            <label>Start IP Host</label>
+            <input type="number" class="form-input" id="input-start-ip" value="101" min="2" max="250">
+          </div>
+          <div class="form-group">
+            <label>End IP Host</label>
+            <input type="number" class="form-input" id="input-end-ip" value="150" min="2" max="254">
+          </div>
+          <div class="form-group">
+            <label>Subnet Mask</label>
+            <input type="text" class="form-input" value="255.255.255.0" readonly>
+          </div>
+          <div class="form-group">
+            <label>Default Gateway</label>
+            <input type="text" class="form-input" value="192.168.1.1" readonly>
+          </div>
+          <div class="form-group">
+            <label>Lease Duration</label>
+            <select class="form-input">
+              <option value="2h" selected>2 Hours (Default)</option>
+              <option value="8h">8 Hours</option>
+              <option value="24h">24 Hours</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('addRangeModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveIpRange()">Save & Apply Range</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Manage Rules -->
+  <div class="modal-backdrop" id="rulesModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Security & Protection Rules</h3>
+        <button class="close-btn" onclick="closeModal('rulesModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="rules-list" id="rules-container">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('rulesModal')">Close</button>
+        <button class="btn btn-primary" onclick="saveRules()">Apply Rules</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: View Logs -->
+  <div class="modal-backdrop" id="logsModal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-header">
+        <h3>DHCP Daemon Security & Transaction Logs</h3>
+        <button class="close-btn" onclick="closeModal('logsModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="logs-toolbar">
+          <input type="text" id="log-search-input" class="form-input" placeholder="Search IP, MAC, or event type..." oninput="filterLogs(this.value)">
+          <div class="filter-pills">
+            <button class="pill active" onclick="setLogFilter('all')">All</button>
+            <button class="pill" onclick="setLogFilter('attack')">Attacks</button>
+            <button class="pill" onclick="setLogFilter('request')">Requests</button>
+            <button class="pill" onclick="setLogFilter('expired')">Expired</button>
+          </div>
+        </div>
+        <div class="logs-container" id="full-logs-container">
+          <!-- Full log list -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('logsModal')">Close</button>
+        <button class="btn btn-primary" onclick="exportLogs()">Export as CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: All Active Leases -->
+  <div class="modal-backdrop" id="allLeasesModal">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-header">
+        <h3>All Active Leases (<span id="all-leases-count">0</span>)</h3>
+        <button class="close-btn" onclick="closeModal('allLeasesModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>IP Address</th>
+                <th>MAC Address</th>
+                <th>Device Type</th>
+                <th>Lease Time Left</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="all-leases-tbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('allLeasesModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Security Details -->
+  <div class="modal-backdrop" id="securityModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>DHCPd-Guard Security Architecture</h3>
+        <button class="close-btn" onclick="closeModal('securityModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="security-detail-item">
+          <div class="sec-badge green">Active</div>
+          <div><strong>State-Aware DHCP Allocation</strong><p>Tracks each client by MAC address and combines transaction state with current IP-pool pressure to decide whether a request is allowed, restricted, or denied.</p></div>
+        </div>
+        <div class="security-detail-item">
+          <div class="sec-badge green">Active</div>
+          <div><strong>Pool-Pressure Monitoring</strong><p>Classifies the active pool as LOW, MEDIUM, or HIGH pressure and applies the state-aware allocation policy when the pool becomes heavily used.</p></div>
+        </div>
+        <div class="security-detail-item">
+          <div class="sec-badge green">Active</div>
+          <div><strong>Transaction State Tracking</strong><p>Maintains NEW, PROBATION, STABLE, SUSPICIOUS, and QUARANTINED client states from DHCP transaction history.</p></div>
+        </div>
+        <div class="security-detail-item">
+          <div class="sec-badge green">Lab Test</div>
+          <div><strong>Attack Event Simulation</strong><p>Provides controlled test events for demonstrating the dashboard's blocking, logging, and notification flow.</p></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('securityModal')">Close</button>
+        <button class="btn btn-primary" onclick="simulateAttackPrompt()">Test Attack Defense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Context Action Dropdown for Table Rows -->
+  <div class="row-menu-dropdown" id="row-menu-dropdown">
+    <button class="menu-item" onclick="handleLeaseAction('revoke')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+      Revoke Lease
+    </button>
+    <button class="menu-item" onclick="handleLeaseAction('renew')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 4 23 10 17 10"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Renew Lease
+    </button>
+    <button class="menu-item" onclick="handleLeaseAction('copy')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+      </svg>
+      Copy MAC Address
+    </button>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

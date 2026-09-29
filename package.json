@@ -1,0 +1,9 @@
+{
+  "name": "dhcpd-guard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "State-aware DHCP allocation and starvation-mitigation lab project",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "cors": "^2.8.5", "express": "^5.1.0" }
+}
